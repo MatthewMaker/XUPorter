@@ -46,6 +46,12 @@ namespace UnityEditor.XCodeEditor
 
 		public string ResolveName( string guid )
 		{
+			
+			if (!this.objects.ContainsKey(guid)) {
+				Debug.LogWarning(this + " ResolveName could not resolve " + guid);
+				return "UNRESOLVED GUID:" + guid;
+			}
+			
 			object entity = this.objects[ guid ];
 
 			if( entity is PBXBuildFile )
