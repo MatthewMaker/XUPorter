@@ -56,7 +56,7 @@ namespace UnityEditor.XCodeEditor
 		public XCProject( string filePath ) : this()
 		{
 			if( !System.IO.Directory.Exists( filePath ) ) {
-				Debug.LogWarning( "Path does not exists." );
+				Debug.LogWarning( "Path does not exist." );
 				return;
 			}
 			
