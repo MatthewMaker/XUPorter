@@ -298,6 +298,11 @@ namespace UnityEditor.XCodeEditor
 			Debug.Log("AddFile " + filePath + ", " + parent + ", " + tree + ", " + (createBuildFiles? "TRUE":"FALSE") + ", " + (weak? "TRUE":"FALSE") ); 
 			
 			PBXDictionary results = new PBXDictionary();
+			if (filePath == null) {
+				Debug.LogError ("AddFile called with null filePath");
+				return results;
+			}
+
 			string absPath = string.Empty;
 			
 			if( Path.IsPathRooted( filePath ) ) {
