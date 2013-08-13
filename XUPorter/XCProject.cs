@@ -543,6 +543,11 @@ namespace UnityEditor.XCodeEditor
 				this.AddHeaderSearchPaths( absoluteHeaderPath );
 			}
 
+			Debug.Log( "Adding compiler flags..." );
+			foreach( string flag in mod.compiler_flags ) {
+				this.AddOtherCFlags( flag );
+			}
+			
 			Debug.Log( "Adding linker flags..." );
 			foreach( string flag in mod.linker_flags ) {
 				this.AddOtherLinkerFlags( flag );
