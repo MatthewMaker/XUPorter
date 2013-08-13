@@ -116,8 +116,11 @@ namespace UnityEditor.XCodeEditor
 						{
 							object parent = this.objects[ parent_guid ];
 
-							if( parent is PBXBuildPhase )
-								return ResolveName( ((PBXBuildPhase)parent).guid );
+							if( parent is PBXBuildPhase ) {
+								string ret = ResolveName( ((PBXBuildPhase)parent).guid );
+								//Debug.Log ("ResolveBuildPhaseNameForFile = " + ret);
+								return ret;
+							}
 						}
 					}
 				}
@@ -221,11 +224,13 @@ namespace UnityEditor.XCodeEditor
 			//Debug.Log( "RESOLVE " + guid + ": " + filename + " in " + location );
 
 			if( filename != null ) {
-				if( location != null )
+				if( location != null ) {
+					//Debug.Log( "GUIDComment " + guid + " " + String.Format( " /* {0} in {1} */", filename, location )  );
 					builder.Append( String.Format( " /* {0} in {1} */", filename, location ) );
-				else
+				} else {
+					//Debug.Log( "GUIDComment " + guid + " " + String.Format( " /* {0} */", filename) );
 					builder.Append( String.Format( " /* {0} */", filename) );
-
+				}
 				return true;
 			}
 
@@ -539,6 +544,7 @@ namespace UnityEditor.XCodeEditor
 
 		private bool SerializeString( string aString, StringBuilder builder, bool useQuotes = false, bool readable = false )
 		{
+			//Debug.Log ("SerializeString " + aString);
 			// Is a GUID?
 			// Note: Unity3d generates mixed-case GUIDs, Xcode use uppercase GUIDs only.
 			if( Regex.IsMatch( aString, @"^[A-Fa-f0-9]{24}$" ) ) {

@@ -63,6 +63,7 @@ namespace UnityEditor.XCodeEditor
 			if( filePath.EndsWith( ".xcodeproj" ) ) {
 				Debug.Log( "Opening project " + filePath );
 				this.projectRootPath = Path.GetDirectoryName( filePath );
+				//Debug.LogWarning ("projectRootPath = " + projectRootPath);
 				this.filePath = filePath;
 			} else {
 				Debug.Log( "Looking for xcodeproj files in " + filePath );
@@ -290,6 +291,8 @@ namespace UnityEditor.XCodeEditor
 		
 		public PBXDictionary AddFile( string filePath, PBXGroup parent = null, string tree = "SOURCE_ROOT", bool createBuildFiles = true, bool weak = false )
 		{
+			Debug.Log("AddFile " + filePath + ", " + parent + ", " + tree + ", " + (createBuildFiles? "TRUE":"FALSE") + ", " + (weak? "TRUE":"FALSE") ); 
+			
 			PBXDictionary results = new PBXDictionary();
 			string absPath = string.Empty;
 			
@@ -305,9 +308,15 @@ namespace UnityEditor.XCodeEditor
 				return results;
 			}
 			else if( tree.CompareTo( "SOURCE_ROOT" ) == 0 ) {
+				//Debug.Log ("abspath = " + absPath);
+
 				System.Uri fileURI = new System.Uri( absPath );
 				System.Uri rootURI = new System.Uri( ( projectRootPath + "/." ) );
 				filePath = rootURI.MakeRelativeUri( fileURI ).ToString();
+				
+				//Debug.Log ("fileUri = " + fileURI);
+				//Debug.Log ("rootURI = " + rootURI);
+				//Debug.Log ("filePath = " + filePath);
 			}
 			
 			if( parent == null ) {
@@ -524,6 +533,7 @@ namespace UnityEditor.XCodeEditor
 			Debug.Log( "Adding folders..." );
 			foreach( string folderPath in mod.folders ) {
 				string absoluteFolderPath = System.IO.Path.Combine( mod.path, folderPath );
+				Debug.Log ("Adding folder " + absoluteFolderPath);
 				this.AddFolder( absoluteFolderPath, modGroup, (string[])mod.excludes.ToArray( typeof(string) ) );
 			}
 			
