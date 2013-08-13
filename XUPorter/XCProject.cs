@@ -326,7 +326,7 @@ namespace UnityEditor.XCodeEditor
 			//Check if there is already a file
 			PBXFileReference fileReference = GetFile( System.IO.Path.GetFileName( filePath ) );	
 			if( fileReference != null ) {
-				Debug.LogWarning("File is already exists: " + filePath);
+				Debug.Log("File already exists: " + filePath); //not a warning, because this is normal for most builds!
 				return null;
 			}
 			
