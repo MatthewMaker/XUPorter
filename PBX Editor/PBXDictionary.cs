@@ -20,6 +20,20 @@ namespace UnityEditor.XCodeEditor
 				this.Add( item.Key, item.Value );
 			}
 		}
+
+		public void Append( PBXSortedDictionary dictionary )
+		{
+			foreach( var item in dictionary) {
+				this.Add( item.Key, item.Value );
+			}
+		}
+
+		public void Append<T>( PBXSortedDictionary<T> dictionary ) where T : PBXObject
+		{
+			foreach( var item in dictionary) {
+				this.Add( item.Key, item.Value );
+			}
+		}
 		
 		/// <summary>
 		/// This allows us to use the form:
@@ -63,6 +77,16 @@ namespace UnityEditor.XCodeEditor
 		}
 		
 		public PBXDictionary( PBXDictionary genericDictionary )
+		{
+			foreach( KeyValuePair<string, object> currentItem in genericDictionary ) {
+				if( ((string)((PBXDictionary)currentItem.Value)[ "isa" ]).CompareTo( typeof(T).Name ) == 0 ) {
+					T instance = (T)System.Activator.CreateInstance( typeof(T), currentItem.Key, (PBXDictionary)currentItem.Value );
+					this.Add( currentItem.Key, instance );
+				}
+			}	
+		}
+		
+		public PBXDictionary( PBXSortedDictionary genericDictionary )
 		{
 			foreach( KeyValuePair<string, object> currentItem in genericDictionary ) {
 				if( ((string)((PBXDictionary)currentItem.Value)[ "isa" ]).CompareTo( typeof(T).Name ) == 0 ) {
