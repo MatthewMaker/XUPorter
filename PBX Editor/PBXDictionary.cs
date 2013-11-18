@@ -35,7 +35,6 @@ namespace UnityEditor.XCodeEditor
 			}
 		}
 
-		
 		/// <summary>
 		/// This allows us to use the form:
 		/// "if (x)" or "if (!x)"
@@ -69,7 +68,7 @@ namespace UnityEditor.XCodeEditor
 		}
 		
 	}
-	
+
 	public class PBXDictionary<T> : Dictionary<string, T> where T : PBXObject
 	{
 		public PBXDictionary()
