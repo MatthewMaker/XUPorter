@@ -569,8 +569,9 @@ namespace UnityEditor.XCodeEditor
 					Debug.LogWarning ("not prepending a path to " + headerpath);
 					this.AddHeaderSearchPaths( headerpath );
 				} else {
-				string absoluteHeaderPath = System.IO.Path.Combine( mod.path, headerpath );
-				this.AddHeaderSearchPaths( absoluteHeaderPath );
+					string absoluteHeaderPath = System.IO.Path.Combine( mod.path, headerpath );
+					this.AddHeaderSearchPaths( absoluteHeaderPath );
+				}
 			}
 
 			Debug.Log( "Adding compiler flags..." );
