@@ -63,7 +63,6 @@ namespace UnityEditor.XCodeEditor
 			if( filePath.EndsWith( ".xcodeproj" ) ) {
 				Debug.Log( "Opening project " + filePath );
 				this.projectRootPath = Path.GetDirectoryName( filePath );
-				//Debug.LogWarning ("projectRootPath = " + projectRootPath);
 				this.filePath = filePath;
 			} else {
 				Debug.Log( "Looking for xcodeproj files in " + filePath );
