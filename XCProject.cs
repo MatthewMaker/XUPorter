@@ -56,7 +56,7 @@ namespace UnityEditor.XCodeEditor
 		public XCProject( string filePath ) : this()
 		{
 			if( !System.IO.Directory.Exists( filePath ) ) {
-				Debug.LogWarning( "Path does not exist." );
+				Debug.LogWarning( "Path does not exist: " + filePath );
 				return;
 			}
 			
@@ -259,6 +259,22 @@ namespace UnityEditor.XCodeEditor
 			return modified;	
 		}
 		
+		public bool overwriteBuildSetting( string settingName, string newValue, string buildConfigName = "all") {
+			Debug.Log("overwriteBuildSetting " + settingName + " " + newValue + " " + buildConfigName);
+			foreach( KeyValuePair<string, XCBuildConfiguration> buildConfig in buildConfigurations ) {
+				//Debug.Log ("build config " + buildConfig);
+				XCBuildConfiguration b = buildConfig.Value;
+				if ( (string)b.data["name"] == buildConfigName || (string)b.data["name"] == "all") {
+					//Debug.Log ("found " + buildConfigName + " config");
+					buildConfig.Value.overwriteBuildSetting(settingName, newValue);
+					modified = true;
+				} else {
+					//Debug.LogWarning ("skipping " + buildConfigName + " config " + (string)b.data["name"]);
+				}
+			}
+			return modified;
+		}
+
 		public bool AddHeaderSearchPaths( string path )
 		{
 			return AddHeaderSearchPaths( new PBXList( path ) );
@@ -266,6 +282,7 @@ namespace UnityEditor.XCodeEditor
 		
 		public bool AddHeaderSearchPaths( PBXList paths )
 		{
+			Debug.Log ("AddHeaderSearchPaths " + paths);
 			foreach( KeyValuePair<string, XCBuildConfiguration> buildConfig in buildConfigurations ) {
 				buildConfig.Value.AddHeaderSearchPaths( paths );
 			}
@@ -280,6 +297,7 @@ namespace UnityEditor.XCodeEditor
 		
 		public bool AddLibrarySearchPaths( PBXList paths )
 		{
+			Debug.Log ("AddLibrarySearchPaths " + paths);
 			foreach( KeyValuePair<string, XCBuildConfiguration> buildConfig in buildConfigurations ) {
 				buildConfig.Value.AddLibrarySearchPaths( paths );
 			}
@@ -308,7 +326,7 @@ namespace UnityEditor.XCodeEditor
 		
 		public PBXDictionary AddFile( string filePath, PBXGroup parent = null, string tree = "SOURCE_ROOT", bool createBuildFiles = true, bool weak = false )
 		{
-			Debug.Log("AddFile " + filePath + ", " + parent + ", " + tree + ", " + (createBuildFiles? "TRUE":"FALSE") + ", " + (weak? "TRUE":"FALSE") ); 
+			//Debug.Log("AddFile " + filePath + ", " + parent + ", " + tree + ", " + (createBuildFiles? "TRUE":"FALSE") + ", " + (weak? "TRUE":"FALSE") ); 
 			
 			PBXDictionary results = new PBXDictionary();
 			if (filePath == null) {
@@ -330,15 +348,9 @@ namespace UnityEditor.XCodeEditor
 				return results;
 			}
 			else if( tree.CompareTo( "SOURCE_ROOT" ) == 0 ) {
-				//Debug.Log ("abspath = " + absPath);
-
 				System.Uri fileURI = new System.Uri( absPath );
 				System.Uri rootURI = new System.Uri( ( projectRootPath + "/." ) );
 				filePath = rootURI.MakeRelativeUri( fileURI ).ToString();
-				
-				//Debug.Log ("fileUri = " + fileURI);
-				//Debug.Log ("rootURI = " + rootURI);
-				//Debug.Log ("filePath = " + filePath);
 			}
 			
 			if( parent == null ) {
@@ -396,10 +408,10 @@ namespace UnityEditor.XCodeEditor
 						}
 						break;
 					case null:
-						Debug.LogWarning( "File Not Support: " + filePath );
+						Debug.LogWarning( "File Not Supported: " + filePath );
 						break;
 					default:
-						Debug.LogWarning( "File Not Support." );
+						Debug.LogWarning( "File Not Supported." );
 						return null;
 				}
 			}
@@ -455,7 +467,7 @@ namespace UnityEditor.XCodeEditor
 			foreach( string directory in Directory.GetDirectories( folderPath ) ) {
 				Debug.Log( "DIR: " + directory );
 				if( directory.EndsWith( ".bundle" ) ) {
-					// Treath it like a file and copy even if not recursive
+					// Treat it like a file and copy even if not recursive
 					// TODO also for .xcdatamodeld?
 					Debug.LogWarning( "This is a special folder: " + directory );
 					AddFile( directory, newGroup, "SOURCE_ROOT", createBuildFile );
@@ -534,12 +546,14 @@ namespace UnityEditor.XCodeEditor
 		
 		public void ApplyMod( XCMod mod )
 		{	
+			Debug.Log ("Applying mod " + mod);
 			PBXGroup modGroup = this.GetGroup( mod.group );
 			
 			Debug.Log( "Adding libraries..." );
 			
 			foreach( XCModFile libRef in mod.libs ) {
 				string completeLibPath = System.IO.Path.Combine( "usr/lib", libRef.filePath );
+				//Debug.Log ("Adding library " + completeLibPath);
 				this.AddFile( completeLibPath, modGroup, "SDKROOT", true, libRef.isWeak );
 			}
 			
@@ -567,8 +581,13 @@ namespace UnityEditor.XCodeEditor
 			
 			Debug.Log( "Adding headerpaths..." );
 			foreach( string headerpath in mod.headerpaths ) {
-				string absoluteHeaderPath = System.IO.Path.Combine( mod.path, headerpath );
-				this.AddHeaderSearchPaths( absoluteHeaderPath );
+				if (headerpath.Contains("$(inherited)")) {
+					Debug.Log ("not prepending a path to " + headerpath);
+					this.AddHeaderSearchPaths( headerpath );
+				} else {
+					string absoluteHeaderPath = System.IO.Path.Combine( mod.path, headerpath );
+					this.AddHeaderSearchPaths( absoluteHeaderPath );
+				}
 			}
 
 			Debug.Log( "Adding compiler flags..." );
