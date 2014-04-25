@@ -12,11 +12,10 @@ namespace UnityEditor.XCodeEditor
 		private const string WEAK_VALUE = "Weak";
 		private const string COMPILER_FLAGS_KEY = "COMPILER_FLAGS";
 		
-		public PBXBuildFile( PBXFileReference fileRef, bool weak = false, string compilerflags = "") : base()
+		public PBXBuildFile( PBXFileReference fileRef, bool weak = false ) : base()
 		{
 			this.Add( FILE_REF_KEY, fileRef.guid );
 			SetWeakLink( weak );
-			SetCompilerFlags( compilerflags );
 		}
 		
 		public PBXBuildFile( string guid, PBXDictionary dictionary ) : base ( guid, dictionary )
@@ -74,48 +73,6 @@ namespace UnityEditor.XCodeEditor
 			settings.Add( ATTRIBUTES_KEY, attributes );
 			this.Add( SETTINGS_KEY, settings );
 			
-			return true;
-		}
-		
-		public bool SetCompilerFlags( string compilerflags )
-		{
-			//Debug.Log ("SetCompilerFlags " + compilerflags);
-			PBXDictionary settings = null;
-			
-			if( !_data.ContainsKey( SETTINGS_KEY ) ) {
-				if( compilerflags.Length > 0 ) {
-					settings = new PBXDictionary();
-					settings.Add( COMPILER_FLAGS_KEY, compilerflags );
-
-					_data.Add( SETTINGS_KEY, settings );
-					//Debug.Log ("creating settings and adding compilerflags to settings " + this);
-					//Debug.Log (_data[ SETTINGS_KEY ]);
-				}
-				return true;
-			}
-			
-			settings = _data[ SETTINGS_KEY ] as PBXDictionary;
-			if( !settings.ContainsKey( COMPILER_FLAGS_KEY ) ) {
-				if( compilerflags.Length > 0 ) {
-					settings.Add( COMPILER_FLAGS_KEY, compilerflags );
-					Debug.Log ("adding compilerflags to settings " + this);
-					return true;
-				}
-				else {
-					return false;
-				}
-			}
-			else {
-				Debug.Log ("we don't change it if it exists already");
-				compilerflags = settings[ COMPILER_FLAGS_KEY ] as string;
-			}
-			
-			if( compilerflags.Length > 0 ) {
-				settings.Add( COMPILER_FLAGS_KEY, compilerflags );
-				this.Add( SETTINGS_KEY, settings );
-			} else {
-				settings.Remove( COMPILER_FLAGS_KEY );
-			}
 			return true;
 		}
 		
